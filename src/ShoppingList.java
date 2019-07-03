@@ -1,6 +1,7 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -51,10 +52,19 @@ public class ShoppingList {
 			itemInput = scnr.nextLine();
 		}
 		//System.out.println(items.get(itemInput));
-		
-		System.out.println("How many " + itemInput + " would you like? ");
-		int amount = scnr.nextInt();
-		
+		int amount = 0;
+		boolean valid = false;
+		while(!valid) {
+			try {
+				System.out.println("How many " + itemInput + " would you like? ");
+				amount = scnr.nextInt();
+			} catch (InputMismatchException ex) {
+				System.out.println("That is not a quantity, try again.");
+				scnr.nextLine();
+				continue;
+			}
+			valid = true;
+		}
 		//Add items to separate Arrays
 		itemSelection.add(itemInput);
 		itemPrice.add(items.get(itemInput));
@@ -77,7 +87,7 @@ public class ShoppingList {
 			System.out.println(itemSelection.get(i) + "     \t$" + itemPrice.get(i) + "(" + quantity.get(i) + ")");
 		}
 		
-		System.out.println("Average price per item in order was " + df2.format(getAverage(itemPrice)));
+		System.out.println("Average price per item in order was " + df2.format(getAverage(itemPrice, quantity)));
 		getHighest(itemPrice, itemSelection);
 		getLowest(itemPrice, itemSelection);
 		getTotal(itemPrice, quantity	);
@@ -85,13 +95,15 @@ public class ShoppingList {
 	}//main
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
 	
-	public static double getAverage(ArrayList<Double> nums) {
+	public static double getAverage(ArrayList<Double> nums, ArrayList<Integer> quant) {
 		double average = 0;
 		double sum = 0;
+		int total = 0;
 		for (int i = 0; i < nums.size(); i++) {
-			sum += nums.get(i);
+			sum += (nums.get(i) * quant.get(i));
+			total += quant.get(i);
 		}
-		average = sum / nums.size();
+		average = sum / total;
 		return average;
 	}
 	
